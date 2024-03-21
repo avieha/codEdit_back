@@ -6,12 +6,18 @@ const server3 = require("http").createServer(app);
 const server4 = require("http").createServer(app);
 const { Server } = require("socket.io");
 const cors = require("cors");
+require('dotenv').config()
 
 // using cors middleware
 app.use(cors());
 
 // I've created 4 different servers and sockets in order to manage each page comms in
 // seperate.
+
+const port1 = process.env.PORT || 3001;
+const port2 = process.env.PORT || 3002;
+const port3 = process.env.PORT || 3003;
+const port4 = process.env.PORT || 3004;
 
 const io1 = new Server(server1, {
     cors: {
@@ -231,15 +237,15 @@ io4.on("connection", function (socket) {
     });
 });
 
-server1.listen(3001, () => {
-    console.log("running, listening on port 3001");
+server1.listen(port1, () => {
+    console.log(`running, listening on port ${port1}`);
 });
-server2.listen(3002, () => {
-    console.log("running, listening on port 3002");
+server2.listen(port2, () => {
+    console.log(`running, listening on port ${port2}`);
 });
-server3.listen(3003, () => {
-    console.log("running, listening on port 3003");
+server3.listen(port3, () => {
+    console.log(`running, listening on port ${port3}`);
 });
-server4.listen(3004, () => {
-    console.log("running, listening on port 3004");
+server4.listen(port4, () => {
+    console.log(`running, listening on port ${port4}`);
 });
