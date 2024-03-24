@@ -15,16 +15,18 @@ app.use(cors());
 // seperate.
 
 const port1 = process.env.PORT || 10000;
-// const port2 = process.env.PORT || 3002;
-// const port3 = process.env.PORT || 3003;
-// const port4 = process.env.PORT || 3004;
+// const port2 = process.env.PORT || 10001;
+// const port3 = process.env.PORT || 10001;
+// const port4 = process.env.PORT || 10001;
 
-const io1 = new Server(server1, {
+const io1 = new Server(server1
+    , {
     cors: {
         origin: "http://localhost:3000",
         methods: ["GET", "POST"],
     },
-});
+}
+);
 
 // const io2 = new Server(server2, {
 //     cors: {
