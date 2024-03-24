@@ -22,7 +22,7 @@ const port1 = process.env.PORT || 10000;
 const io1 = new Server(server1
     , {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://code-edit24.netlify.app:3000",
         methods: ["GET", "POST"],
     },
 }
