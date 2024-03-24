@@ -12,7 +12,7 @@ app.use(cors());
 // changes on-line and managing users on different pages.
 
 const port1 = process.env.PORT || 10000;
-const io = new Server(server
+const io1 = new Server(server
     , {
         cors: {
             methods: ["GET", "POST"],
@@ -20,7 +20,7 @@ const io = new Server(server
     }
 );
 
-io.on("connection", function (socket) {
+io1.on("connection", function (socket) {
 
     // Array to store users' IPs
     let users = [];
@@ -51,7 +51,7 @@ io.on("connection", function (socket) {
     });
 
     // Handle changing pages
-    socket.on('page_change', ({ currentPage }) => {
+    socket.on('send_num', ({ currentPage }) => {
         // Update the current page for the user
         const userIndex = users.findIndex(user => user.ip === userIP);
         if (userIndex !== -1) {
@@ -60,24 +60,9 @@ io.on("connection", function (socket) {
         socket.broadcast.emit('receive_num', { count });
     });
 
-    socket.on('send_code1', ({ newCode }) => {
+    socket.on('send_code', ({ newCode }) => {
         // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code1', { newCode });
-    });
-
-    socket.on('send_code2', ({ newCode }) => {
-        // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code2', { newCode });
-    });
-
-    socket.on('send_code3', ({ newCode }) => {
-        // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code3', { newCode });
-    });
-
-    socket.on('send_code4', ({ newCode }) => {
-        // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code4', { newCode });
+        socket.broadcast.emit('receive_code', { newCode });
     });
 });
 
