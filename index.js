@@ -1,9 +1,6 @@
 const express = require("express");
 const app = express();
-const server1 = require("http").createServer(app);
-// const server2 = require("http").createServer(app);
-// const server3 = require("http").createServer(app);
-// const server4 = require("http").createServer(app);
+const server = require("http").createServer(app);
 const { Server } = require("socket.io");
 const cors = require("cors");
 require('dotenv').config()
@@ -19,10 +16,10 @@ const port1 = process.env.PORT || 10000;
 // const port3 = process.env.PORT || 10001;
 // const port4 = process.env.PORT || 10001;
 
-const io1 = new Server(server1
+const io1 = new Server(server
     , {
     cors: {
-        origin: "https://code-edit24.netlify.app",
+        // origin: "https://code-edit24.netlify.app",
         methods: ["GET", "POST"],
     },
 }
@@ -239,7 +236,7 @@ io1.on("connection", function (socket) {
 //     });
 // });
 
-server1.listen(port1, () => {
+server.listen(port1, () => {
     console.log(`running, listening on port ${port1}`);
 });
 // server2.listen(port2, () => {
