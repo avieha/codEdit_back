@@ -11,8 +11,8 @@ app.use(cors());
 // I've created Server to talk with the client, sending code
 // changes on-line and managing users on different pages.
 
-const port1 = process.env.PORT || 10000;
-const io1 = new Server(server
+const port = process.env.PORT || 10000;
+const io = new Server(server
     , {
         cors: {
             methods: ["GET", "POST"],
@@ -20,193 +20,68 @@ const io1 = new Server(server
     }
 );
 
-io1.on("connection", function (socket) {
+// Define a route to get the user's IP address
+app.get('/get_ip', (req, res) => {
+    // Get the IP address from the request object
+    const userIP = req.ip;
+});
 
+io.on("connection", function (socket) {
     // Array to store users' IPs
     let users = [];
 
-    // number of users currently on page
-    let count = 0;
-
-    // Get user's IP address
-    const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
-
-    // Check if the user is already in the list
-    let userIndex = users.findIndex(user => user.ip === userIP);
-
-    if (userIndex === -1) {
-        count = count + 1;
-        userIndex = count;
-        users[userIndex] = { ip: userIP, currentPage: '/block1' };
-    }
-
-    console.log(`User connected with IP: ${userIP}`);
-
     socket.on('disconnect', () => {
-        count = count - 1;
-        users[userIndex] = 0;
-        console.log("USERS: ");
-        console.log(users);
-        console.log(`User disconnected with IP: ${userIP} and now ${count} users.`);
+        // Remove user from the array on disconnect
+        const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
+        users = users.filter(user => user.ip !== userIP);
+        console.log(`User disconnected with IP: ${userIP}`);
     });
 
     // Handle changing pages
-    socket.on('send_num', ({ currentPage }) => {
-        // Update the current page for the user
-        const userIndex = users.findIndex(user => user.ip === userIP);
-        if (userIndex !== -1) {
+    socket.on('page_change', ({ currentPage }) => {
+
+        console.log("Page Change: " + currentPage);
+        const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
+        // Check if the user is already in the list
+        let userIndex = users.findIndex(user => user.ip === userIP);
+        if (userIndex === -1) {
+            // Push new user to the array
+            users.push({ ip: userIP, currentPage: currentPage });
+        } else {
             users[userIndex].currentPage = currentPage;
         }
-        socket.broadcast.emit('receive_num', { count });
+
+        // Console log and iterate over users' IPs
+        console.log("Users' IPs:");
+        users.forEach(user => {
+            console.log(user.ip);
+        });
+
+        socket.broadcast.emit('receive_users', { count: users.length });
     });
 
-    socket.on('send_code', ({ newCode }) => {
+    socket.on('send_code1', ({ newCode1 }) => {
         // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code', { newCode });
+        socket.broadcast.emit('receive_code1', { newCode1 });
     });
+
+    socket.on('send_code2', ({ newCode2 }) => {
+        // Broadcast the code changes to all clients
+        socket.broadcast.emit('receive_code2', { newCode2 });
+    });
+
+    socket.on('send_code3', ({ newCode3 }) => {
+        // Broadcast the code changes to all clients
+        socket.broadcast.emit('receive_code3', { newCode3 });
+    });
+
+    socket.on('send_code4', ({ newCode4 }) => {
+        // Broadcast the code changes to all clients
+        socket.broadcast.emit('receive_code4', { newCode4 });
+    });
+
 });
 
-// io2.on("connection", function (socket) {
-
-//     // Array to store users' IPs
-//     let users = [];
-
-//     // number of users currently on page
-//     let count = -1;
-
-//     // Get user's IP address
-//     const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
-
-//     // Check if the user is already in the list
-//     let userIndex = users.findIndex(user => user.ip === userIP);
-
-//     if (userIndex === -1) {
-//         count = count + 1;
-//         userIndex = count;
-//         users[userIndex] = { ip: userIP, currentPage: '/block2' };
-//     }
-
-//     console.log(`User connected with IP: ${userIP}`);
-
-//     socket.on('disconnect', () => {
-//         count = count - 1;
-//         users[userIndex] = 0;
-//         console.log("USERS: ");
-//         console.log(users);
-//         console.log(`User disconnected with IP: ${userIP} and now ${users.length} users.`);
-//     });
-
-//     // Handle changing pages
-//     socket.on('change_page', ({ currentPage }) => {
-//         // Update the current page for the user
-//         const userIndex = users.findIndex(user => user.ip === userIP);
-//         if (userIndex !== -1) {
-//             users[userIndex].currentPage = currentPage;
-//         }
-//     });
-
-//     socket.on('send_code', ({ newCode }) => {
-//         // console.log("Data Received in server:" + newCode);
-
-//         // Broadcast the code changes to all clients
-//         socket.broadcast.emit('receive_code', { newCode });
-//     });
-// });
-
-// io3.on("connection", function (socket) {
-
-//     // Array to store users' IPs
-//     let users = [];
-
-//     // number of users currently on page
-//     let count = -1;
-
-//     // Get user's IP address
-//     const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
-
-//     // Check if the user is already in the list
-//     let userIndex = users.findIndex(user => user.ip === userIP);
-
-//     if (userIndex === -1) {
-//         count = count + 1;
-//         userIndex = count;
-//         users[userIndex] = { ip: userIP, currentPage: '/block3' };
-//     }
-
-//     console.log(`User connected with IP: ${userIP}`);
-
-//     socket.on('disconnect', () => {
-//         count = count - 1;
-//         users[userIndex] = 0;
-//         console.log("USERS: ");
-//         console.log(users);
-//         console.log(`User disconnected with IP: ${userIP} and now ${users.length} users.`);
-//     });
-
-//     // Handle changing pages
-//     socket.on('change_page', ({ currentPage }) => {
-//         // Update the current page for the user
-//         const userIndex = users.findIndex(user => user.ip === userIP);
-//         if (userIndex !== -1) {
-//             users[userIndex].currentPage = currentPage;
-//         }
-//     });
-
-//     socket.on('send_code', ({ newCode }) => {
-//         // console.log("Data Received in server:" + newCode);
-
-//         // Broadcast the code changes to all clients
-//         socket.broadcast.emit('receive_code', { newCode });
-//     });
-// });
-
-// io4.on("connection", function (socket) {
-
-//     // Array to store users' IPs
-//     let users = [];
-
-//     // number of users currently on page
-//     let count = -1;
-
-//     // Get user's IP address
-//     const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
-
-//     // Check if the user is already in the list
-//     let userIndex = users.findIndex(user => user.ip === userIP);
-
-//     if (userIndex === -1) {
-//         count = count + 1;
-//         userIndex = count;
-//         users[userIndex] = { ip: userIP, currentPage: '/block4' };
-//     }
-
-//     console.log(`User connected with IP: ${userIP}`);
-
-//     socket.on('disconnect', () => {
-//         count = count - 1;
-//         users[userIndex] = 0;
-//         console.log("USERS: ");
-//         console.log(users);
-//         console.log(`User disconnected with IP: ${userIP} and now ${users.length} users.`);
-//     });
-
-//     // Handle changing pages
-//     socket.on('change_page', ({ currentPage }) => {
-//         // Update the current page for the user
-//         const userIndex = users.findIndex(user => user.ip === userIP);
-//         if (userIndex !== -1) {
-//             users[userIndex].currentPage = currentPage;
-//         }
-//     });
-
-//     socket.on('send_code', ({ newCode }) => {
-//         // console.log("Data Received in server:" + newCode);
-
-//         // Broadcast the code changes to all clients
-//         socket.broadcast.emit('receive_code', { newCode });
-//     });
-// });
-
-server.listen(port1, () => {
-    console.log(`running, listening on port ${port1}`);
+server.listen(port, () => {
+    console.log(`running, listening on port ${port}`);
 });
