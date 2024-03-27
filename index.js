@@ -40,13 +40,14 @@ io.on("connection", function (socket) {
         }
 
         // sends to the client the number of users currently on page
-        let count = 0;
-        users.forEach(user => {
-            if (user.currentPage === currentPage) {
-                count = count + 1;
-            }
-        });
-        socket.broadcast.emit('receive_users', { count });
+        // let count = 0;
+        // users.forEach(user => {
+        //     if (user.currentPage === currentPage) {
+        //         count = count + 1;
+        //     }
+        // });
+        let firstUser = users[0].userId;
+        socket.broadcast.emit('receive_users', { count ,firstUser});
 
         // Console log and iterate over users' IDs
         console.log("Users table:");
