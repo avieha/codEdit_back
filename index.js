@@ -47,7 +47,7 @@ io.on("connection", function (socket) {
         //     }
         // });
         let firstUser = users[0].userId;
-        socket.broadcast.emit('receive_users', { count ,firstUser});
+        socket.broadcast.emit('receive_users', {firstUser});
 
         // Console log and iterate over users' IDs
         console.log("Users table:");
