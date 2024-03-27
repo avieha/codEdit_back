@@ -20,64 +20,67 @@ const io = new Server(server
     }
 );
 
-// Define a route to get the user's IP address
-app.get('/get_ip', (req, res) => {
-    // Get the IP address from the request object
-    const userIP = req.ip;
-});
+// Array to store users' IPs, each cell for each codeBlock
+let users = [];
+// let userId = -1;
 
 io.on("connection", function (socket) {
-    // Array to store users' IPs
-    let users = [];
-
-    socket.on('disconnect', () => {
-        // Remove user from the array on disconnect
-        const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
-        users = users.filter(user => user.ip !== userIP);
-        console.log(`User disconnected with IP: ${userIP}`);
-    });
+    console.log("------------------------");
+    console.log("Connection established");
 
     // Handle changing pages
-    socket.on('page_change', ({ currentPage }) => {
-
-        console.log("Page Change: " + currentPage);
-        const userIP = socket.handshake.headers['x-real-ip'] || socket.handshake.address;
+    socket.on('page_change', ({ currentPage, userId }) => {
         // Check if the user is already in the list
-        let userIndex = users.findIndex(user => user.ip === userIP);
+        let userIndex = users.findIndex(user => user.userId === userId);
         if (userIndex === -1) {
             // Push new user to the array
-            users.push({ ip: userIP, currentPage: currentPage });
+            users.push({ userId: userId, currentPage: currentPage });
         } else {
             users[userIndex].currentPage = currentPage;
         }
 
-        // Console log and iterate over users' IPs
-        console.log("Users' IPs:");
+        // sends to the client the number of users currently on page
+        let count = 0;
         users.forEach(user => {
-            console.log(user.ip);
+            if (user.currentPage === currentPage) {
+                count = count + 1;
+            }
         });
+        socket.broadcast.emit('receive_users', { count });
 
-        socket.broadcast.emit('receive_users', { count: users.length });
+        // Console log and iterate over users' IDs
+        console.log("Users table:");
+        users.forEach(user => {
+            console.log(user);
+        });
     });
 
-    socket.on('send_code1', ({ newCode1 }) => {
+    socket.on('send_code1', ({ newCode }) => {
+        console.log("send_code1: " + newCode);
         // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code1', { newCode1 });
+        socket.broadcast.emit('receive_code1', { newCode });
     });
 
-    socket.on('send_code2', ({ newCode2 }) => {
+    socket.on('send_code2', ({ newCode }) => {
+        console.log("send_code2: " + newCode);
         // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code2', { newCode2 });
+        socket.broadcast.emit('receive_code2', { newCode });
     });
 
-    socket.on('send_code3', ({ newCode3 }) => {
+    socket.on('send_code3', ({ newCode }) => {
         // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code3', { newCode3 });
+        socket.broadcast.emit('receive_code3', { newCode });
     });
 
-    socket.on('send_code4', ({ newCode4 }) => {
+    socket.on('send_code4', ({ newCode }) => {
         // Broadcast the code changes to all clients
-        socket.broadcast.emit('receive_code4', { newCode4 });
+        socket.broadcast.emit('receive_code4', { newCode });
+    });
+
+    socket.on('disconnect', () => {
+        // Remove user from the array on disconnect
+        // users = users.filter(user => user.Id === users[userIndex].userId);
+        console.log(`User disconnected`);
     });
 
 });
