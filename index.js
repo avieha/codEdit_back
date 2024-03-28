@@ -20,9 +20,8 @@ const io = new Server(server
     }
 );
 
-// Array to store users' IPs, each cell for each codeBlock
+// Array to store users' IDs, and their current page
 let users = [];
-// let userId = -1;
 
 io.on("connection", function (socket) {
     console.log("------------------------");
@@ -39,48 +38,41 @@ io.on("connection", function (socket) {
             users[userIndex].currentPage = currentPage;
         }
 
-        // sends to the client the number of users currently on page
-        // let count = 0;
-        // users.forEach(user => {
-        //     if (user.currentPage === currentPage) {
-        //         count = count + 1;
-        //     }
-        // });
+        // let the client know if its a mentor
         let firstUser = users[0].userId;
-        socket.broadcast.emit('receive_users', {firstUser});
+        socket.broadcast.emit('receive_users', { firstUser });
 
-        // Console log and iterate over users' IDs
-        console.log("Users table:");
+        // Console log and iterate over users' IDs+
+        console.log("currentUSERIndex: " + userIndex + " Users table:");
         users.forEach(user => {
             console.log(user);
         });
     });
 
+    // first code block
     socket.on('send_code1', ({ newCode }) => {
         console.log("send_code1: " + newCode);
         // Broadcast the code changes to all clients
         socket.broadcast.emit('receive_code1', { newCode });
     });
-
+    // second code block
     socket.on('send_code2', ({ newCode }) => {
         console.log("send_code2: " + newCode);
         // Broadcast the code changes to all clients
         socket.broadcast.emit('receive_code2', { newCode });
     });
-
+    // third code block
     socket.on('send_code3', ({ newCode }) => {
         // Broadcast the code changes to all clients
         socket.broadcast.emit('receive_code3', { newCode });
     });
-
+    // fourth code block
     socket.on('send_code4', ({ newCode }) => {
         // Broadcast the code changes to all clients
         socket.broadcast.emit('receive_code4', { newCode });
     });
 
     socket.on('disconnect', () => {
-        // Remove user from the array on disconnect
-        // users = users.filter(user => user.Id === users[userIndex].userId);
         console.log(`User disconnected`);
     });
 
