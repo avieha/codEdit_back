@@ -22,6 +22,7 @@ const io = new Server(server
 
 // Array to store users' IDs, and their current page
 let users = [];
+let userIdRec = -1;
 
 io.on("connection", function (socket) {
     console.log("------------------------");
@@ -29,8 +30,10 @@ io.on("connection", function (socket) {
 
     // Handle changing pages
     socket.on('page_change', ({ currentPage, userId }) => {
+        userIdRec = userId;
+        
         // Check if the user is already in the list
-        let userIndex = users.findIndex(user => user.userId === userId);
+        userIndex = users.findIndex(user => user.userId === userId);
         if (userIndex === -1) {
             // Push new user to the array
             users.push({ userId: userId, currentPage: currentPage });
@@ -38,12 +41,19 @@ io.on("connection", function (socket) {
             users[userIndex].currentPage = currentPage;
         }
 
-        // let the client know if its a mentor
-        let firstUser = users[0].userId;
+        let firstUser = -1;
+        // let the client know if he is a mentor
+        for (let i = 0; i < users.length; i++) {
+            if (users[i].currentPage === currentPage) {
+                firstUser = i;
+                break;
+            }
+        }
+        console.log("first user: " + firstUser);
         socket.broadcast.emit('receive_users', { firstUser });
 
         // Console log and iterate over users' IDs+
-        console.log("currentUSERIndex: " + userIndex + " Users table:");
+        console.log(" Users table:");
         users.forEach(user => {
             console.log(user);
         });
@@ -73,6 +83,12 @@ io.on("connection", function (socket) {
     });
 
     socket.on('disconnect', () => {
+        users = users.filter(user => user.userId !== userIdRec);
+        // Console log and iterate over users' IDs+
+        console.log("Disconnect: " + " Users table:");
+        users.forEach(user => {
+            console.log(user);
+        });
         console.log(`User disconnected`);
     });
 
