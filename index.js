@@ -31,7 +31,7 @@ io.on("connection", function (socket) {
     // Handle changing pages
     socket.on('page_change', ({ currentPage, userId }) => {
         userIdRec = userId;
-        
+
         // Check if the user is already in the list
         userIndex = users.findIndex(user => user.userId === userId);
         if (userIndex === -1) {
@@ -41,14 +41,15 @@ io.on("connection", function (socket) {
             users[userIndex].currentPage = currentPage;
         }
 
-        let firstUser = -1;
+        let firstUserIndex = -1;
         // let the client know if he is a mentor
         for (let i = 0; i < users.length; i++) {
             if (users[i].currentPage === currentPage) {
-                firstUser = i;
+                firstUserIndex = i;
                 break;
             }
         }
+        firstUser = users[firstUserIndex].userId;
         console.log("first user: " + firstUser);
         socket.broadcast.emit('receive_users', { firstUser });
 
