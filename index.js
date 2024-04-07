@@ -22,12 +22,13 @@ const io = new Server(server
 
 // Array to store users' IDs, and their current page
 let users = [];
+let firsts = [[""],[""],[""],[""]];
 let userIdRec = -1;
 
 io.on("connection", function (socket) {
     console.log("------------------------");
     console.log("Connection established");
-
+    
     // Handle changing pages
     socket.on('page_change', ({ currentPage, userId }) => {
         userIdRec = userId;
@@ -43,13 +44,11 @@ io.on("connection", function (socket) {
 
         let firstUserIndex = -1;
         // let the client know if he is a mentor
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].currentPage === currentPage) {
-                firstUserIndex = i;
-                break;
-            }
+        if (firsts[currentPage.substring(6)]==""){
+            firsts[currentPage.substring(6)]=userId;
         }
-        firstUser = users[firstUserIndex].userId;
+
+        firstUser = firsts[currentPage.substring(6)];
         console.log("first user: " + firstUser);
         socket.broadcast.emit('receive_users', { firstUser });
 
